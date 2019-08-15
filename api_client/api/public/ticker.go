@@ -27,5 +27,13 @@ func (t ticker) Ticker(symbol configuration.Symbol) (*model.TickerRes, error) {
 	tickerRes := new(model.TickerRes)
 	err = json.Unmarshal(res, tickerRes)
 
-	return tickerRes, err
+	if err != nil {
+		return nil, fmt.Errorf("[Ticker]error:%v,body:%s", err, res)
+	}
+
+	if len(tickerRes.Messages) != 0 {
+		return nil, fmt.Errorf("%v", tickerRes.Messages)
+	}
+
+	return tickerRes, nil
 }
