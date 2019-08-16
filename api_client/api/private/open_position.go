@@ -32,9 +32,5 @@ func (c *openPosition) OpenPositions(symbol configuration.Symbol, pageNo int) (*
 		return nil, fmt.Errorf("%v", opensPositionRes.Messages)
 	}
 
-	positionID := make([]int64, 0, len(opensPositionRes.Data.List))
-	for _, p := range opensPositionRes.Data.List {
-		positionID = append(positionID, p.PositionID)
-	}
 	return opensPositionRes, nil
 }
