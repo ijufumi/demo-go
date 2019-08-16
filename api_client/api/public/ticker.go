@@ -5,8 +5,13 @@ import (
 	"api_client/api/public/internal/connect"
 	"api_client/api/public/model"
 	"encoding/json"
+	"fmt"
 	"net/url"
 )
+
+type Ticker interface {
+	Ticker(symbol configuration.Symbol) (*model.TickerRes, error)
+}
 
 type ticker struct {
 	con connect.Connection

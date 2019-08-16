@@ -1,24 +1,22 @@
 package private
 
 import (
-	"api_client/api/common/configuration"
 	"api_client/api/private/internal/connect"
-	"api_client/api/private/model"
-
-	"github.com/shopspring/decimal"
 )
 
 type Client interface {
-	Order(symbol configuration.Symbol, side configuration.Side, executionType configuration.ExecutionType, price, size decimal.Decimal) (*model.OrderRes, error)
-	CancelOrder(orderID int64) error
-	OpenPositions(symbol configuration.Symbol, pageNo int) (*model.OpenPositionRes, error)
-	CloseOrder(positionID int64, symbol configuration.Symbol, side configuration.Side, executionType configuration.ExecutionType, price, size decimal.Decimal) (*model.CloseOrderRes, error)
+	Order
+	ActiveOrders
+	CancelOrder
+	OpenPositions
+	CloseOrder
 }
 
 type client struct {
 	order
+	activeOrders
 	cancelOrder
-	openPosition
+	openPositions
 	closeOrder
 }
 
@@ -27,9 +25,10 @@ func New(apiKey, secretKey string) Client {
 	c := &client{}
 	con := connect.New(apiKey, secretKey)
 	c.order.con = con
+	c.activeOrders.con = con
 	c.cancelOrder.con = con
 	c.closeOrder.con = con
-	c.openPosition.con = con
+	c.openPositions.con = con
 
 	return c
 }

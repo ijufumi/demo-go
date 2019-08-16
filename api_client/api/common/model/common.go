@@ -9,3 +9,8 @@ type ResponseCommon struct {
 	Status       int                 `json:"status"`
 	ResponseTime time.Time           `json:"responsetime"`
 }
+
+type Pagination struct {
+	CurrentPage int `json:"currentPage"`
+	Count       int `json:"count"`
+}

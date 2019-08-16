@@ -1,12 +1,7 @@
 package public
 
-import (
-	"api_client/api/common/configuration"
-	"api_client/api/public/model"
-)
-
 type Client interface {
-	Ticker(symbol configuration.Symbol) (*model.TickerRes, error)
+	Ticker
 }
 
 type client struct {

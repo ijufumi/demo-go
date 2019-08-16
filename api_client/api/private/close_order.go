@@ -10,6 +10,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+type CloseOrder interface {
+	CloseOrder(positionID int64, symbol configuration.Symbol, side configuration.Side, executionType configuration.ExecutionType, price, size decimal.Decimal) (*model.CloseOrderRes, error)
+}
+
 type closeOrder struct {
 	con *connect.Connection
 }

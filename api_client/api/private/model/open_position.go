@@ -11,11 +11,8 @@ import (
 type OpenPositionRes struct {
 	model.ResponseCommon
 	Data struct {
-		Pagination struct {
-			CurrentPage int `json:"currentPage"`
-			Count       int `json:"count"`
-		} `json:"pagination"`
-		List []struct {
+		model.Pagination `json:"pagination"`
+		List             []struct {
 			PositionID   int64                `json:"positionId"`
 			Symbol       configuration.Symbol `json:"symbol"`
 			Side         configuration.Side   `json:"side"`

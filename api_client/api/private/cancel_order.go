@@ -7,6 +7,10 @@ import (
 	"fmt"
 )
 
+type CancelOrder interface {
+	CancelOrder(orderID int64) error
+}
+
 type cancelOrder struct {
 	con *connect.Connection
 }
