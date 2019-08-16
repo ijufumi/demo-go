@@ -28,7 +28,7 @@ func (c *order) Order(symbol configuration.Symbol, side configuration.Side, exec
 		Size:          size,
 	}
 
-	if executionType == configuration.ExecutionType_LIMIT {
+	if executionType == configuration.ExecutionTypeLIMIT {
 		req.Price = &price
 	}
 

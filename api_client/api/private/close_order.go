@@ -31,7 +31,7 @@ func (c *closeOrder) CloseOrder(positionID int64, symbol configuration.Symbol, s
 		}},
 	}
 
-	if executionType == configuration.ExecutionType_LIMIT {
+	if executionType == configuration.ExecutionTypeLIMIT {
 		req.Price = &price
 	}
 

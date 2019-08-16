@@ -22,7 +22,7 @@ type ticker struct {
 func (t ticker) Ticker(symbol configuration.Symbol) (*model.TickerRes, error) {
 	param := url.Values{}
 
-	if symbol != configuration.Symbol_NONE {
+	if symbol != configuration.SymbolNONE {
 		param.Set("symbol", string(symbol))
 	}
 
