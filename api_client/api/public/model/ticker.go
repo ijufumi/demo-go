@@ -8,6 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// TickerRes ...
 type TickerRes struct {
 	model.ResponseCommon
 	Data []struct {

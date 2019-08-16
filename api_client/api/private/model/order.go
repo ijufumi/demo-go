@@ -7,6 +7,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// OrderReq ...
 type OrderReq struct {
 	Symbol        configuration.Symbol        `json:"symbol"`
 	Side          configuration.Side          `json:"side"`
@@ -15,6 +16,7 @@ type OrderReq struct {
 	Size          decimal.Decimal             `json:"size"`
 }
 
+// OrderRes ...
 type OrderRes struct {
 	model.ResponseCommon
 	Data int64 `json:"data,string"`

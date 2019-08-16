@@ -14,11 +14,13 @@ import (
 
 const host = "https://api.coin.z.com/private"
 
+// Connection ...
 type Connection struct {
 	apiKey    string
 	secretKey string
 }
 
+// New ...
 func New(apiKey, secretKey string) *Connection {
 	return &Connection{
 		apiKey:    apiKey,
@@ -26,6 +28,7 @@ func New(apiKey, secretKey string) *Connection {
 	}
 }
 
+// Post ...
 func (c *Connection) Post(body interface{}, path string) ([]byte, error) {
 	b, err := json.Marshal(body)
 	if err != nil {
@@ -61,6 +64,7 @@ func (c *Connection) Post(body interface{}, path string) ([]byte, error) {
 	return resBody, nil
 }
 
+// Get ...
 func (c *Connection) Get(param url.Values, path string) ([]byte, error) {
 	queryString := param.Encode()
 	reqeuest, err := http.NewRequest("GET", host+path+"?"+queryString, nil)

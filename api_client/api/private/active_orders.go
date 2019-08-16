@@ -9,6 +9,7 @@ import (
 	"net/url"
 )
 
+// ActiveOrders ...
 type ActiveOrders interface {
 	ActiveOrders(symbol configuration.Symbol, pageNo int) (*model.ActiveOrdersRes, error)
 }
@@ -17,6 +18,7 @@ type activeOrders struct {
 	con *connect.Connection
 }
 
+// ActiveOrders ...
 func (c activeOrders) ActiveOrders(symbol configuration.Symbol, pageNo int) (*model.ActiveOrdersRes, error) {
 	req := url.Values{
 		"symbol": {string(symbol)},

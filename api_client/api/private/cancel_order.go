@@ -7,6 +7,7 @@ import (
 	"fmt"
 )
 
+// CancelOrder ...
 type CancelOrder interface {
 	CancelOrder(orderID int64) error
 }
@@ -15,6 +16,7 @@ type cancelOrder struct {
 	con *connect.Connection
 }
 
+// CancelOrder ...
 func (c *cancelOrder) CancelOrder(orderID int64) error {
 	req := model.CancelOrderReq{OrderID: orderID}
 	res, err := c.con.Post(req, "/v1/cancelOrder")

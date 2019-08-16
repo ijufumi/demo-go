@@ -1,73 +1,111 @@
 package configuration
 
+// Debug if you would like to output debug log, set to true.
 var Debug = true
 
+// ExecutionType ...
 type ExecutionType string
 
 const (
-	ExecutionType_MARKET = ExecutionType("MARKET")
-	ExecutionType_LIMIT  = ExecutionType("LIMIT")
+	// ExecutionTypeMARKET ...
+	ExecutionTypeMARKET = ExecutionType("MARKET")
+
+	// ExecutionTypeLIMIT ...
+	ExecutionTypeLIMIT = ExecutionType("LIMIT")
 )
 
+// Side ...
 type Side string
 
+// Opposite returns opposite side.
 func (s Side) Opposite() Side {
-	if s == Side_BUY {
-		return Side_SELL
+	if s == SideBUY {
+		return SideSELL
 	}
-	return Side_BUY
+	return SideBUY
 }
 
 const (
-	Side_BUY  = Side("BUY")
-	Side_SELL = Side("SELL")
+	// SideBUY ...
+	SideBUY = Side("BUY")
+	// SideSELL ...
+	SideSELL = Side("SELL")
 )
 
+// Symbol ...
 type Symbol string
 
 const (
-	Symbol_BTC    = Symbol("BTC")
-	Symbol_ETH    = Symbol("ETH")
-	Symbol_BCH    = Symbol("BCH")
-	Symbol_LTC    = Symbol("LTC")
-	Symbol_XRP    = Symbol("XRP")
-	Symbol_BTCJPY = Symbol("BTC_JPY")
-	Symbol_ETHJPY = Symbol("ETH_JPY")
-	Symbol_BCHJPY = Symbol("BCH_JPY")
-	Symbol_LTCJPY = Symbol("LTC_JPY")
-	Symbol_XRPJPY = Symbol("XRP_JPY")
-	Symbol_NONE   = Symbol("")
+	// SymbolBTC ...
+	SymbolBTC = Symbol("BTC")
+	// SymbolETH ...
+	SymbolETH = Symbol("ETH")
+	// SymbolBCH ...
+	SymbolBCH = Symbol("BCH")
+	// SymbolLTC ...
+	SymbolLTC = Symbol("LTC")
+	// SymbolXRP ...
+	SymbolXRP = Symbol("XRP")
+	// SymbolBTCJPY ...
+	SymbolBTCJPY = Symbol("BTC_JPY")
+	// SymbolETHJPY ...
+	SymbolETHJPY = Symbol("ETH_JPY")
+	// SymbolBCHJPY ...
+	SymbolBCHJPY = Symbol("BCH_JPY")
+	// SymbolLTCJPY ...
+	SymbolLTCJPY = Symbol("LTC_JPY")
+	// SymbolXRPJPY ...
+	SymbolXRPJPY = Symbol("XRP_JPY")
+	// SymbolNONE ...
+	SymbolNONE = Symbol("")
 )
 
+// OrderType ...
 type OrderType string
 
 const (
-	OrderType_NORMAL  = OrderType("NORMAL")
-	OrderType_LOSSCUT = OrderType("LOSSCUT")
+	// OrderTypeNORMAL ...
+	OrderTypeNORMAL = OrderType("NORMAL")
+	// OrderTypeLOSSCUT ...
+	OrderTypeLOSSCUT = OrderType("LOSSCUT")
 )
 
+// SettleType ...
 type SettleType string
 
 const (
-	SettleType_OPEN  = SettleType("OPEN")
-	SettleType_CLOSE = SettleType("CLOSE")
+	// SettleTypeOPEN ...
+	SettleTypeOPEN = SettleType("OPEN")
+	// SettleTypeCLOSE ...
+	SettleTypeCLOSE = SettleType("CLOSE")
 )
 
+// OrderStatus ...
 type OrderStatus string
 
 const (
-	OrderStatus_WAITING    = OrderStatus("WAITING")
-	OrderStatus_ORDERED    = OrderStatus("ORDERED")
-	OrderStatus_MODIFYING  = OrderStatus("MODIFYING")
-	OrderStatus_CANCELLING = OrderStatus("CANCELLING")
-	OrderStatus_CANCELED   = OrderStatus("CANCELED")
-	OrderStatus_EXECUTED   = OrderStatus("EXECUTED")
-	OrderStatus_EXPIRED    = OrderStatus("EXPIRED")
+	// OrderStatusWAITING ...
+	OrderStatusWAITING = OrderStatus("WAITING")
+	// OrderStatusORDERED ...
+	OrderStatusORDERED = OrderStatus("ORDERED")
+	// OrderStatusMODIFYING ...
+	OrderStatusMODIFYING = OrderStatus("MODIFYING")
+	// OrderStatusCANCELLING ...
+	OrderStatusCANCELLING = OrderStatus("CANCELLING")
+	// OrderStatusCANCELED ...
+	OrderStatusCANCELED = OrderStatus("CANCELED")
+	// OrderStatusEXECUTED ...
+	OrderStatusEXECUTED = OrderStatus("EXECUTED")
+	// OrderStatusEXPIRED ...
+	OrderStatusEXPIRED = OrderStatus("EXPIRED")
 )
 
+// TimeInForce ...
 type TimeInForce string
 
 const (
-	TimeInForce_FAK = TimeInForce("FAK")
-	TimeInForce_FAS = TimeInForce("FAS")
+	// TimeInForceFAK ...
+	TimeInForceFAK = TimeInForce("FAK")
+	// TimeInForceFAS ...
+	TimeInForceFAS = TimeInForce("FAS")
 )

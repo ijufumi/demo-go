@@ -9,6 +9,7 @@ import (
 	"net/url"
 )
 
+// OpenPositions ...
 type OpenPositions interface {
 	OpenPositions(symbol configuration.Symbol, pageNo int) (*model.OpenPositionRes, error)
 }
@@ -17,6 +18,7 @@ type openPositions struct {
 	con *connect.Connection
 }
 
+// OpenPositions ...
 func (c *openPositions) OpenPositions(symbol configuration.Symbol, pageNo int) (*model.OpenPositionRes, error) {
 	req := url.Values{
 		"symbol": {string(symbol)},

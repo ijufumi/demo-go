@@ -10,8 +10,10 @@ import (
 
 const host = "https://api.coin.z.com/public"
 
+// Connection ...
 type Connection struct{}
 
+// Get ...
 func (c *Connection) Get(param url.Values, path string) ([]byte, error) {
 	queryString := param.Encode()
 	urlString := host + path

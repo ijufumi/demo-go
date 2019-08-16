@@ -9,6 +9,7 @@ import (
 	"net/url"
 )
 
+// Ticker ...
 type Ticker interface {
 	Ticker(symbol configuration.Symbol) (*model.TickerRes, error)
 }
@@ -17,6 +18,7 @@ type ticker struct {
 	con connect.Connection
 }
 
+// Ticker ...
 func (t ticker) Ticker(symbol configuration.Symbol) (*model.TickerRes, error) {
 	param := url.Values{}
 

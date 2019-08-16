@@ -4,6 +4,7 @@ import (
 	"api_client/api/private/internal/connect"
 )
 
+// Client ...
 type Client interface {
 	Order
 	ActiveOrders

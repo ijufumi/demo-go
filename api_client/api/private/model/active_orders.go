@@ -8,6 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// ActiveOrdersRes ...
 type ActiveOrdersRes struct {
 	model.ResponseCommon
 	Data struct {

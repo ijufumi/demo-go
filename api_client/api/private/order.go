@@ -10,6 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// Order ...
 type Order interface {
 	Order(symbol configuration.Symbol, side configuration.Side, executionType configuration.ExecutionType, price, size decimal.Decimal) (*model.OrderRes, error)
 }
@@ -18,6 +19,7 @@ type order struct {
 	con *connect.Connection
 }
 
+// Order ...
 func (c *order) Order(symbol configuration.Symbol, side configuration.Side, executionType configuration.ExecutionType, price, size decimal.Decimal) (*model.OrderRes, error) {
 	req := model.OrderReq{
 		Symbol:        symbol,

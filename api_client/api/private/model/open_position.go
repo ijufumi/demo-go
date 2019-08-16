@@ -8,6 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// OpenPositionRes ...
 type OpenPositionRes struct {
 	model.ResponseCommon
 	Data struct {
