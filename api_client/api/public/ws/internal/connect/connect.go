@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -43,6 +44,10 @@ func New() *Connection {
 
 func (c *Connection) run() {
 	defer func() {
+		if c.isConnected() {
+			_ = c.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+			_ = c.conn.Close()
+		}
 	}()
 
 	for {
@@ -100,7 +105,6 @@ func (c *Connection) dial() error {
 
 	if c.conn != nil {
 		_ = c.conn.Close()
-		c.conn = nil
 		c.state.Store(connectionStateClosed)
 	}
 
@@ -108,6 +112,13 @@ func (c *Connection) dial() error {
 	if err != nil {
 		return fmt.Errorf("dial error:%v, response:%v", err, res)
 	}
+
+	conn.SetReadLimit(1024)
+	_ = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	conn.SetPongHandler(func(appData string) error {
+		_ = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+		return nil
+	})
 	c.conn = conn
 	c.state.Store(connectionStateConnected)
 
