@@ -23,6 +23,7 @@ type Connection struct {
 	sync.Mutex
 	conn  *websocket.Conn
 	state *atomic.Value
+	ctx   context.Context
 	stop  context.CancelFunc
 }
 
@@ -33,13 +34,14 @@ func New() *Connection {
 	}
 	conn.state.Store(connectionStateClosed)
 	ctx, cancelFunc := context.WithCancel(context.Background())
+	conn.ctx = ctx
 	conn.stop = cancelFunc
 
-	go conn.run(ctx)
+	go conn.run()
 	return conn
 }
 
-func (c *Connection) run(ctx context.Context) {
+func (c *Connection) run() {
 	defer func() {
 	}()
 
@@ -51,7 +53,7 @@ func (c *Connection) run(ctx context.Context) {
 		}
 
 		select {
-		case <-ctx.Done():
+		case <-c.ctx.Done():
 			return
 		}
 	}
