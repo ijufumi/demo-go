@@ -3,7 +3,7 @@ module api_client
 go 1.12
 
 require (
-	github.com/gorilla/websocket v1.4.1 // indirect
+	github.com/gorilla/websocket v1.4.1
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24
 	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472 // indirect
 	golang.org/x/lint v0.0.0-20190409202823-959b441ac422 // indirect

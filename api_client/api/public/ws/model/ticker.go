@@ -2,10 +2,19 @@ package model
 
 import (
 	"api_client/api/common/configuration"
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
+// TickerReq is request of ticker.
+type TickerReq struct {
+	Command              string `json:"command"`
+	Channel              string `json:"command"`
+	configuration.Symbol `json:"symbol"`
+}
+
+// TickerRes is response of ticker.
 type TickerRes struct {
 	Channel   string               `json:"channel"`
 	Ask       decimal.Decimal      `json:"ask"`
