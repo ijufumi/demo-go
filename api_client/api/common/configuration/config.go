@@ -109,3 +109,19 @@ const (
 	// TimeInForceFAS ...
 	TimeInForceFAS = TimeInForce("FAS")
 )
+
+// WebSocketCommand ...
+type WebSocketCommand string
+
+const (
+	WebSocketCommandSubscribe   = WebSocketCommand("subscribe")
+	WebSocketCommandUnsubscribe = WebSocketCommand("unsubscribe")
+)
+
+// WebSocketChannel ...
+type WebSocketChannel string
+
+const (
+	WebSocketChannelTicker     = WebSocketChannel("ticker")
+	WebSocketChannelOrderBooks = WebSocketChannel("orderbooks")
+)

@@ -9,14 +9,14 @@ import (
 
 // TickerReq is request of ticker.
 type TickerReq struct {
-	Command              string `json:"command"`
-	Channel              string `json:"command"`
+	Command              configuration.WebSocketCommand `json:"command"`
+	Channel              configuration.WebSocketChannel `json:"channel"`
 	configuration.Symbol `json:"symbol"`
 }
 
 // TickerRes is response of ticker.
 type TickerRes struct {
-	Channel   string               `json:"channel"`
+	ResCommon
 	Ask       decimal.Decimal      `json:"ask"`
 	Bid       decimal.Decimal      `json:"bid"`
 	High      decimal.Decimal      `json:"high"`

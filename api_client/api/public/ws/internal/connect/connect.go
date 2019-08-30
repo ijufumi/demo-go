@@ -10,33 +10,36 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const host = "https://api.coin.z.com/ws/public/v1"
+const host = "wss://api.coin.z.com/ws/public/v1"
 
 type connectionState string
 
 const (
-	connectionStateConnected = "Connected"
-	connectionStateClosed    = "Closed"
+	connectionStateConnecting = connectionState("Connecting")
+	connectionStateConnected  = connectionState("Connected")
+	connectionStateClosed     = connectionState("Closed")
 )
 
 // Connection ...
 type Connection struct {
 	sync.Mutex
-	conn  *websocket.Conn
-	state *atomic.Value
-	ctx   context.Context
-	stop  context.CancelFunc
+	conn   *websocket.Conn
+	state  *atomic.Value
+	ctx    context.Context
+	stop   context.CancelFunc
+	stream chan []byte
 }
 
 // New is...
 func New() *Connection {
+	ctx, cancelFunc := context.WithCancel(context.Background())
 	conn := &Connection{
-		state: &atomic.Value{},
+		state:  &atomic.Value{},
+		ctx:    ctx,
+		stop:   cancelFunc,
+		stream: make(chan []byte, 100),
 	}
 	conn.state.Store(connectionStateClosed)
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	conn.ctx = ctx
-	conn.stop = cancelFunc
 
 	go conn.run()
 	return conn
@@ -53,10 +56,19 @@ func (c *Connection) run() {
 	for {
 		if !c.isConnected() {
 			if err := c.dial(); err != nil {
+				fmt.Println(err)
 				continue
 			}
 		}
 
+		msgType, msg, err := c.conn.ReadMessage()
+		if err != nil {
+			fmt.Println(err)
+			continue // TODO:review
+		}
+		if websocket.TextMessage == msgType {
+			c.stream <- msg
+		}
 		select {
 		case <-c.ctx.Done():
 			return
@@ -65,14 +77,17 @@ func (c *Connection) run() {
 }
 
 func (c *Connection) isConnected() bool {
+	c.Lock()
+	defer c.Unlock()
 	v, ok := c.state.Load().(connectionState)
 
+	fmt.Println(fmt.Sprintf("isConnected:%v", v))
 	if !ok {
 		c.state.Store(connectionStateClosed)
 		return false
 	}
 
-	return v == connectionStateConnected
+	return v == connectionStateConnected || v == connectionStateConnecting
 }
 
 // Send is...
@@ -80,11 +95,15 @@ func (c *Connection) Send(msg interface{}) error {
 	if !c.isConnected() {
 		err := c.dial()
 		if err != nil {
-			return err
+			return fmt.Errorf("dial error:%v", err)
 		}
 	}
 
-	return c.conn.WriteJSON(msg)
+	err := c.conn.WriteJSON(msg)
+	if err != nil {
+		return fmt.Errorf("write error:%v", err)
+	}
+	return nil
 }
 
 // SendByte is....
@@ -92,27 +111,35 @@ func (c *Connection) SendByte(msg []byte) error {
 	if !c.isConnected() {
 		err := c.dial()
 		if err != nil {
-			return err
+			return fmt.Errorf("dial error:%v", err)
 		}
 	}
 
-	return c.conn.WriteMessage(websocket.TextMessage, msg)
+	err := c.conn.WriteMessage(websocket.TextMessage, msg)
+	if err != nil {
+		return fmt.Errorf("write error:%v", err)
+	}
+	return nil
 }
 
 func (c *Connection) dial() error {
 	c.Lock()
 	defer c.Unlock()
 
+	fmt.Println("dial start")
 	if c.conn != nil {
-		_ = c.conn.Close()
 		c.state.Store(connectionStateClosed)
+		_ = c.conn.Close()
 	}
 
+	c.state.Store(connectionStateConnecting)
 	conn, res, err := websocket.DefaultDialer.Dial(host, nil)
 	if err != nil {
+		c.state.Store(connectionStateClosed)
 		return fmt.Errorf("dial error:%v, response:%v", err, res)
 	}
 
+	fmt.Println(fmt.Sprintf("conn:%+v", conn))
 	conn.SetReadLimit(1024)
 	_ = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	conn.SetPongHandler(func(appData string) error {
@@ -120,9 +147,15 @@ func (c *Connection) dial() error {
 		return nil
 	})
 	c.conn = conn
+	fmt.Println(fmt.Sprintf("conn:%+v", c.conn))
 	c.state.Store(connectionStateConnected)
 
 	return nil
+}
+
+// Stream ...
+func (c *Connection) Stream() <-chan []byte {
+	return c.stream
 }
 
 // Close is ...

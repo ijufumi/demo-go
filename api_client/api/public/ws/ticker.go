@@ -4,12 +4,14 @@ import (
 	"api_client/api/common/configuration"
 	"api_client/api/public/ws/internal/connect"
 	"api_client/api/public/ws/model"
+	"encoding/json"
 )
 
 // Ticker is receiving price data.
 type Ticker interface {
 	SubscribeTicker(symbol configuration.Symbol) error
 	UnsubscribeTicker(symbol configuration.Symbol) error
+	ReceiveTicker() <-chan *model.TickerRes
 }
 
 type ticker struct {
@@ -18,8 +20,8 @@ type ticker struct {
 
 func (t *ticker) SubscribeTicker(symbol configuration.Symbol) error {
 	req := model.TickerReq{
-		Command: "subscribe",
-		Channel: "ticker",
+		Command: configuration.WebSocketCommandSubscribe,
+		Channel: configuration.WebSocketChannelTicker,
 		Symbol:  symbol,
 	}
 
@@ -28,10 +30,32 @@ func (t *ticker) SubscribeTicker(symbol configuration.Symbol) error {
 
 func (t *ticker) UnsubscribeTicker(symbol configuration.Symbol) error {
 	req := model.TickerReq{
-		Command: "unsubscribe",
-		Channel: "ticker",
+		Command: configuration.WebSocketCommandUnsubscribe,
+		Channel: configuration.WebSocketChannelTicker,
 		Symbol:  symbol,
 	}
 
 	return t.conn.Send(req)
+}
+
+func (t *ticker) ReceiveTicker() <-chan *model.TickerRes {
+	c := make(chan *model.TickerRes)
+	go func() {
+		for {
+			select {
+			case v := <-t.conn.Stream():
+				if v == nil {
+					return
+				}
+				res := new(model.TickerRes)
+				err := json.Unmarshal(v, res)
+				if err != nil {
+					// TODO:error handling
+					continue
+				}
+				c <- res
+			}
+		}
+	}()
+	return c
 }
