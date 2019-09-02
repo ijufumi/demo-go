@@ -3,6 +3,7 @@ package connect
 import (
 	"context"
 	"fmt"
+	"log"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -56,22 +57,24 @@ func (c *Connection) run() {
 	for {
 		if !c.isConnected() {
 			if err := c.dial(); err != nil {
-				fmt.Println(err)
+				log.Println(err)
 				continue
 			}
 		}
 
-		msgType, msg, err := c.conn.ReadMessage()
+		_, msg, err := c.conn.ReadMessage()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(fmt.Sprintf("[ReadMessage]error:%v", err))
+			_ = c.conn.Close()
+			c.state.Store(connectionStateClosed)
 			continue // TODO:review
 		}
-		if websocket.TextMessage == msgType {
-			c.stream <- msg
-		}
+
+		c.stream <- msg
 		select {
 		case <-c.ctx.Done():
 			return
+		default:
 		}
 	}
 }
@@ -81,7 +84,6 @@ func (c *Connection) isConnected() bool {
 	defer c.Unlock()
 	v, ok := c.state.Load().(connectionState)
 
-	fmt.Println(fmt.Sprintf("isConnected:%v", v))
 	if !ok {
 		c.state.Store(connectionStateClosed)
 		return false
@@ -92,17 +94,16 @@ func (c *Connection) isConnected() bool {
 
 // Send is...
 func (c *Connection) Send(msg interface{}) error {
-	if !c.isConnected() {
-		err := c.dial()
-		if err != nil {
-			return fmt.Errorf("dial error:%v", err)
-		}
+	err := c.waitForConnected()
+	if err != nil {
+		return err
 	}
 
-	err := c.conn.WriteJSON(msg)
+	err = c.conn.WriteJSON(msg)
 	if err != nil {
 		return fmt.Errorf("write error:%v", err)
 	}
+	log.Printf("[Send]msg:%+v", msg)
 	return nil
 }
 
@@ -122,11 +123,25 @@ func (c *Connection) SendByte(msg []byte) error {
 	return nil
 }
 
+func (c *Connection) waitForConnected() error {
+	if c.isConnected() {
+		return nil
+	}
+
+	for i := 0; i < 10; i++ {
+		if c.isConnected() {
+			return nil
+		}
+		time.Sleep(time.Second)
+	}
+	return fmt.Errorf("connection timeout")
+}
+
 func (c *Connection) dial() error {
 	c.Lock()
 	defer c.Unlock()
 
-	fmt.Println("dial start")
+	log.Println("dial start")
 	if c.conn != nil {
 		c.state.Store(connectionStateClosed)
 		_ = c.conn.Close()
@@ -139,15 +154,13 @@ func (c *Connection) dial() error {
 		return fmt.Errorf("dial error:%v, response:%v", err, res)
 	}
 
-	fmt.Println(fmt.Sprintf("conn:%+v", conn))
 	conn.SetReadLimit(1024)
-	_ = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-	conn.SetPongHandler(func(appData string) error {
-		_ = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-		return nil
-	})
+	_ = conn.SetReadDeadline(time.Now().Add(120 * time.Second))
+	//conn.SetPongHandler(func(appData string) error {
+	//	_ = conn.SetReadDeadline(time.Now().Add(120 * time.Second))
+	//	return nil
+	//})
 	c.conn = conn
-	fmt.Println(fmt.Sprintf("conn:%+v", c.conn))
 	c.state.Store(connectionStateConnected)
 
 	return nil

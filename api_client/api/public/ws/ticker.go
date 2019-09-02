@@ -5,6 +5,7 @@ import (
 	"api_client/api/public/ws/internal/connect"
 	"api_client/api/public/ws/model"
 	"encoding/json"
+	"log"
 )
 
 // Ticker is receiving price data.
@@ -39,7 +40,7 @@ func (t *ticker) UnsubscribeTicker(symbol configuration.Symbol) error {
 }
 
 func (t *ticker) ReceiveTicker() <-chan *model.TickerRes {
-	c := make(chan *model.TickerRes)
+	c := make(chan *model.TickerRes, 10)
 	go func() {
 		for {
 			select {
@@ -47,6 +48,7 @@ func (t *ticker) ReceiveTicker() <-chan *model.TickerRes {
 				if v == nil {
 					return
 				}
+				log.Printf("received:%v", string(v))
 				res := new(model.TickerRes)
 				err := json.Unmarshal(v, res)
 				if err != nil {
