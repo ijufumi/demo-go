@@ -2,6 +2,7 @@ package model
 
 import (
 	"api_client/api/common/configuration"
+	"api_client/api/public/ws/model"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -16,7 +17,7 @@ type TickerReq struct {
 
 // TickerRes is response of ticker.
 type TickerRes struct {
-	ResCommon
+	model.ResCommon
 	Ask       decimal.Decimal      `json:"ask"`
 	Bid       decimal.Decimal      `json:"bid"`
 	High      decimal.Decimal      `json:"high"`
