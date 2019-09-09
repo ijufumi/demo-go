@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	client := ticker.New()
-	e := client.Subscribe(configuration.SymbolBCHJPY)
+	client := ticker.New(configuration.SymbolBCHJPY)
+	e := client.Subscribe()
 	if e != nil {
 		log.Println(e)
 		return
@@ -22,7 +22,7 @@ func main() {
 			log.Println("timeout...")
 		}
 	}
-	e = client.Unsubscribe(configuration.SymbolBCHJPY)
+	e = client.Unsubscribe()
 	if e != nil {
 		log.Println(e)
 		return

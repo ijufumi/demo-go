@@ -13,6 +13,8 @@ import (
 
 const host = "wss://api.coin.z.com/ws/public/v1"
 
+// const host = "wss://ws.zaif.jp/stream?currency_pair=btc_jpy"
+
 type connectionState string
 
 const (
@@ -24,26 +26,44 @@ const (
 // Connection ...
 type Connection struct {
 	sync.Mutex
-	conn   *websocket.Conn
-	state  *atomic.Value
-	ctx    context.Context
-	stop   context.CancelFunc
-	stream chan []byte
+	conn      *websocket.Conn
+	state     *atomic.Value
+	ctx       context.Context
+	stopFunc  context.CancelFunc
+	stream    chan []byte
+	msgStream chan msgRequest
+}
+
+type msgRequest struct {
+	msg     interface{}
+	errChan chan error
 }
 
 // New is...
 func New() *Connection {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	conn := &Connection{
-		state:  &atomic.Value{},
-		ctx:    ctx,
-		stop:   cancelFunc,
-		stream: make(chan []byte, 100),
+		state:     &atomic.Value{},
+		ctx:       ctx,
+		stopFunc:  cancelFunc,
+		stream:    make(chan []byte, 100),
+		msgStream: make(chan msgRequest, 1),
 	}
 	conn.state.Store(connectionStateClosed)
 
 	go conn.run()
 	return conn
+}
+
+func (c *Connection) CreateSendFunc(f func() interface{}) func() error {
+	return func() error {
+		req := msgRequest{
+			msg:     f(),
+			errChan: make(chan error),
+		}
+		c.msgStream <- req
+		return <-req.errChan
+	}
 }
 
 func (c *Connection) run() {
@@ -60,6 +80,13 @@ func (c *Connection) run() {
 				log.Println(err)
 				continue
 			}
+		}
+
+		select {
+		case m := <-c.msgStream:
+			e := c.Send(m.msg)
+			m.errChan <- e
+		default:
 		}
 
 		_, msg, err := c.conn.ReadMessage()
@@ -107,22 +134,6 @@ func (c *Connection) Send(msg interface{}) error {
 	return nil
 }
 
-// SendByte is....
-func (c *Connection) SendByte(msg []byte) error {
-	if !c.isConnected() {
-		err := c.dial()
-		if err != nil {
-			return fmt.Errorf("dial error:%v", err)
-		}
-	}
-
-	err := c.conn.WriteMessage(websocket.TextMessage, msg)
-	if err != nil {
-		return fmt.Errorf("write error:%v", err)
-	}
-	return nil
-}
-
 func (c *Connection) waitForConnected() error {
 	if c.isConnected() {
 		return nil
@@ -154,7 +165,7 @@ func (c *Connection) dial() error {
 		return fmt.Errorf("dial error:%v, response:%v", err, res)
 	}
 
-	conn.SetReadLimit(1024)
+	conn.SetReadLimit(10240)
 	_ = conn.SetReadDeadline(time.Now().Add(120 * time.Second))
 	//conn.SetPongHandler(func(appData string) error {
 	//	_ = conn.SetReadDeadline(time.Now().Add(120 * time.Second))
@@ -173,5 +184,5 @@ func (c *Connection) Stream() <-chan []byte {
 
 // Close is ...
 func (c *Connection) Close() {
-	c.stop()
+	c.stopFunc()
 }
