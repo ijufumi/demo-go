@@ -2,13 +2,13 @@ package main
 
 import (
 	"api_client/api/common/configuration"
-	"api_client/api/public/ws/channel/ticker"
+	"api_client/api/public/ws/channel/orderbooks"
 	"log"
 	"time"
 )
 
 func main() {
-	client := ticker.New(configuration.SymbolBTCJPY)
+	client := orderbooks.New(configuration.SymbolBTCJPY)
 	timeoutCnt := 0
 	for {
 		select {

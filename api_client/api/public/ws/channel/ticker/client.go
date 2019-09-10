@@ -3,7 +3,6 @@ package ticker
 import (
 	"api_client/api/common/configuration"
 	"api_client/api/public/ws/internal/connect"
-	"api_client/api/public/ws/ticker/model"
 	"encoding/json"
 	"log"
 )
@@ -11,7 +10,7 @@ import (
 type Client interface {
 	Subscribe() error
 	Unsubscribe() error
-	Receive() <-chan *model.TickerRes
+	Receive() <-chan *Response
 }
 
 type client struct {
@@ -21,14 +20,14 @@ type client struct {
 func New(symbol configuration.Symbol) Client {
 	conn := connect.New()
 	conn.SetSubscribeFunc(func() interface{} {
-		return model.TickerReq{
+		return Request{
 			Command: configuration.WebSocketCommandSubscribe,
 			Channel: configuration.WebSocketChannelTicker,
 			Symbol:  symbol,
 		}
 	})
 	conn.SetUnsubscribeFunc(func() interface{} {
-		return model.TickerReq{
+		return Request{
 			Command: configuration.WebSocketCommandUnsubscribe,
 			Channel: configuration.WebSocketChannelTicker,
 			Symbol:  symbol,
@@ -48,8 +47,8 @@ func (c *client) Unsubscribe() error {
 	return c.conn.Unsubscribe()
 }
 
-func (c *client) Receive() <-chan *model.TickerRes {
-	stream := make(chan *model.TickerRes, 10)
+func (c *client) Receive() <-chan *Response {
+	stream := make(chan *Response, 10)
 	go func() {
 		for {
 			select {
@@ -58,10 +57,10 @@ func (c *client) Receive() <-chan *model.TickerRes {
 					return
 				}
 				log.Printf("received:%v", string(v))
-				res := new(model.TickerRes)
+				res := new(Response)
 				err := json.Unmarshal(v, res)
 				if err != nil {
-					log.Printf("[Ticker] unmarshal error:%v", err)
+					log.Printf("[OrderBooks] unmarshal error:%v", err)
 					continue
 				}
 				stream <- res

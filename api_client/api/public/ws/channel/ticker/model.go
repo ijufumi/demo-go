@@ -1,4 +1,4 @@
-package model
+package ticker
 
 import (
 	"api_client/api/common/configuration"
@@ -8,15 +8,15 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// TickerReq is request of ticker.
-type TickerReq struct {
+// Request is request of ticker.
+type Request struct {
 	Command              configuration.WebSocketCommand `json:"command"`
 	Channel              configuration.WebSocketChannel `json:"channel"`
 	configuration.Symbol `json:"symbol"`
 }
 
-// TickerRes is response of ticker.
-type TickerRes struct {
+// Response is response of ticker.
+type Response struct {
 	model.ResCommon
 	Ask       decimal.Decimal      `json:"ask"`
 	Bid       decimal.Decimal      `json:"bid"`
