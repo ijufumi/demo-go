@@ -8,18 +8,23 @@ import (
 )
 
 func main() {
-	client := ticker.New(configuration.SymbolBCHJPY)
+	client := ticker.New(configuration.SymbolBTCJPY)
 	e := client.Subscribe()
 	if e != nil {
 		log.Println(e)
 		return
 	}
-	for i := 0; i < 10; i++ {
+	timeoutCnt := 0
+	for {
 		select {
 		case v := <-client.Receive():
 			log.Printf("msg:%+v", v)
 		case <-time.After(180 * time.Second):
 			log.Println("timeout...")
+			timeoutCnt++
+		}
+		if timeoutCnt > 20 {
+			break
 		}
 	}
 	e = client.Unsubscribe()

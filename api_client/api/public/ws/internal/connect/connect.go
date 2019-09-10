@@ -26,12 +26,14 @@ const (
 // Connection ...
 type Connection struct {
 	sync.Mutex
-	conn      *websocket.Conn
-	state     *atomic.Value
-	ctx       context.Context
-	stopFunc  context.CancelFunc
-	stream    chan []byte
-	msgStream chan msgRequest
+	conn            *websocket.Conn
+	state           *atomic.Value
+	ctx             context.Context
+	stopFunc        context.CancelFunc
+	subscribeFunc   func() error
+	unsubscribeFunc func() error
+	stream          chan []byte
+	msgStream       chan msgRequest
 }
 
 type msgRequest struct {
@@ -51,11 +53,28 @@ func New() *Connection {
 	}
 	conn.state.Store(connectionStateClosed)
 
-	go conn.run()
+	go conn.send()
+	go conn.receive()
 	return conn
 }
 
-func (c *Connection) CreateSendFunc(f func() interface{}) func() error {
+func (c *Connection) SetSubscribeFunc(f func() interface{}) {
+	c.subscribeFunc = c.createSendFunc(f)
+}
+
+func (c *Connection) SetUnsubscribeFunc(f func() interface{}) {
+	c.unsubscribeFunc = c.createSendFunc(f)
+}
+
+func (c *Connection) Subscribe() error {
+	return c.subscribeFunc()
+}
+
+func (c *Connection) Unsubscribe() error {
+	return c.unsubscribeFunc()
+}
+
+func (c *Connection) createSendFunc(f func() interface{}) func() error {
 	return func() error {
 		req := msgRequest{
 			msg:     f(),
@@ -66,7 +85,20 @@ func (c *Connection) CreateSendFunc(f func() interface{}) func() error {
 	}
 }
 
-func (c *Connection) run() {
+func (c *Connection) send() {
+	ctx, _ := context.WithCancel(c.ctx)
+	for {
+		select {
+		case m := <-c.msgStream:
+			e := c.Send(m.msg)
+			m.errChan <- e
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+func (c *Connection) receive() {
 	defer func() {
 		if c.isConnected() {
 			_ = c.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
@@ -80,15 +112,14 @@ func (c *Connection) run() {
 				log.Println(err)
 				continue
 			}
+			e := c.subscribeFunc()
+			if e != nil {
+				log.Println(fmt.Sprintf("[Subscribe]error:%v", e))
+				_ = c.conn.Close()
+				c.state.Store(connectionStateClosed)
+				continue // TODO:review
+			}
 		}
-
-		select {
-		case m := <-c.msgStream:
-			e := c.Send(m.msg)
-			m.errChan <- e
-		default:
-		}
-
 		_, msg, err := c.conn.ReadMessage()
 		if err != nil {
 			log.Println(fmt.Sprintf("[ReadMessage]error:%v", err))
@@ -167,10 +198,10 @@ func (c *Connection) dial() error {
 
 	conn.SetReadLimit(10240)
 	_ = conn.SetReadDeadline(time.Now().Add(120 * time.Second))
-	//conn.SetPongHandler(func(appData string) error {
-	//	_ = conn.SetReadDeadline(time.Now().Add(120 * time.Second))
-	//	return nil
-	//})
+	conn.SetPongHandler(func(appData string) error {
+		_ = conn.SetReadDeadline(time.Now().Add(120 * time.Second))
+		return nil
+	})
 	c.conn = conn
 	c.state.Store(connectionStateConnected)
 

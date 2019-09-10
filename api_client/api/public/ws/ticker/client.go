@@ -15,39 +15,37 @@ type Client interface {
 }
 
 type client struct {
-	conn            *connect.Connection
-	subscribeFunc   func() error
-	unsubscribeFunc func() error
+	conn *connect.Connection
 }
 
 func New(symbol configuration.Symbol) Client {
 	conn := connect.New()
+	conn.SetSubscribeFunc(func() interface{} {
+		return model.TickerReq{
+			Command: configuration.WebSocketCommandSubscribe,
+			Channel: configuration.WebSocketChannelTicker,
+			Symbol:  symbol,
+		}
+	})
+	conn.SetUnsubscribeFunc(func() interface{} {
+		return model.TickerReq{
+			Command: configuration.WebSocketCommandUnsubscribe,
+			Channel: configuration.WebSocketChannelTicker,
+			Symbol:  symbol,
+		}
+	})
 	c := &client{
 		conn: conn,
-		subscribeFunc: conn.CreateSendFunc(func() interface{} {
-			return model.TickerReq{
-				Command: configuration.WebSocketCommandSubscribe,
-				Channel: configuration.WebSocketChannelTicker,
-				Symbol:  symbol,
-			}
-		}),
-		unsubscribeFunc: conn.CreateSendFunc(func() interface{} {
-			return model.TickerReq{
-				Command: configuration.WebSocketCommandUnsubscribe,
-				Channel: configuration.WebSocketChannelTicker,
-				Symbol:  symbol,
-			}
-		}),
 	}
 	return c
 }
 
 func (c *client) Subscribe() error {
-	return c.subscribeFunc()
+	return c.conn.Subscribe()
 }
 
 func (c *client) Unsubscribe() error {
-	return c.unsubscribeFunc()
+	return c.conn.Unsubscribe()
 }
 
 func (c *client) Receive() <-chan *model.TickerRes {
