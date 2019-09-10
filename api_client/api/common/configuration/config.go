@@ -125,3 +125,12 @@ const (
 	WebSocketChannelTicker     = WebSocketChannel("ticker")
 	WebSocketChannelOrderBooks = WebSocketChannel("orderbooks")
 )
+
+// ExchangeStatus ...
+type ExchangeStatus string
+
+const (
+	ExchangeStatusOpen        = ExchangeStatus("OPEN")
+	ExchangeStatusPreOpen     = ExchangeStatus("PREOPEN")
+	ExchangeStatusMaintenance = ExchangeStatus("MAINTENANCE")
+)

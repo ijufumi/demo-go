@@ -17,7 +17,7 @@ type Request struct {
 
 // Response is response of ticker.
 type Response struct {
-	model.ResCommon
+	model.ResponseCommon
 	Ask       decimal.Decimal      `json:"ask"`
 	Bid       decimal.Decimal      `json:"bid"`
 	High      decimal.Decimal      `json:"high"`

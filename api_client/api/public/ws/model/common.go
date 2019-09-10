@@ -2,7 +2,7 @@ package model
 
 import "api_client/api/common/configuration"
 
-// ResCommon ...
-type ResCommon struct {
+// ResponseCommon ...
+type ResponseCommon struct {
 	Channel configuration.WebSocketChannel `json:"channel"`
 }
