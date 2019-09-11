@@ -1,9 +1,9 @@
-package public
+package rest
 
 import (
 	"api_client/api/common/configuration"
-	"api_client/api/public/internal/connect"
-	"api_client/api/public/model"
+	"api_client/api/public/rest/internal/connect"
+	"api_client/api/public/rest/model"
 	"encoding/json"
 	"fmt"
 	"net/url"

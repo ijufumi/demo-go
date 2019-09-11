@@ -1,4 +1,4 @@
-package public
+package rest
 
 // Client ...
 type Client interface {
