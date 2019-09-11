@@ -4,11 +4,13 @@ package rest
 type Client interface {
 	Ticker
 	Status
+	OrderBooks
 }
 
 type client struct {
 	ticker
 	status
+	orderbooks
 }
 
 // New ...
