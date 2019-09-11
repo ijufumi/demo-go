@@ -5,12 +5,14 @@ type Client interface {
 	Ticker
 	Status
 	OrderBooks
+	Trades
 }
 
 type client struct {
 	ticker
 	status
 	orderbooks
+	trades
 }
 
 // New ...
