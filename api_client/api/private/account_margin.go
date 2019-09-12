@@ -17,7 +17,7 @@ type accountMargin struct {
 }
 
 func (a *accountMargin) AccountMargin() (*model.AccountMarginRes, error) {
-	res, err := a.con.Get(url.Values{}, "")
+	res, err := a.con.Get(url.Values{}, "/v1/account/margin")
 	if err != nil {
 		return nil, err
 	}

@@ -67,7 +67,11 @@ func (c *Connection) Post(body interface{}, path string) ([]byte, error) {
 // Get ...
 func (c *Connection) Get(param url.Values, path string) ([]byte, error) {
 	queryString := param.Encode()
-	req, err := http.NewRequest("GET", host+path+"?"+queryString, nil)
+	urlString := host + path
+	if len(queryString) != 0 {
+		urlString = urlString + "?" + queryString
+	}
+	req, err := http.NewRequest("GET", urlString, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +103,7 @@ func (c *Connection) Get(param url.Values, path string) ([]byte, error) {
 }
 
 func (c *Connection) makeHeader(systemDatetime time.Time, r *http.Request, method, path, body string) {
-	timeStamp := systemDatetime.Unix()*1000 + int64(systemDatetime.Nanosecond())/int64(time.Microsecond)
+	timeStamp := systemDatetime.Unix()*1000 + int64(systemDatetime.Nanosecond())/int64(time.Millisecond)
 	r.Header.Set("API-TIMESTAMP", fmt.Sprint(timeStamp))
 	r.Header.Set("API-KEY", c.apiKey)
 	r.Header.Set("API-SIGN", auth.MakeSign(c.secretKey, timeStamp, method, path, body))
