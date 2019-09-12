@@ -20,24 +20,24 @@ func (c *Connection) Get(param url.Values, path string) ([]byte, error) {
 	if len(queryString) != 0 {
 		urlString = urlString + "?" + queryString
 	}
-	reqeuest, err := http.NewRequest("GET", urlString, nil)
+	req, err := http.NewRequest("GET", urlString, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	if configuration.Debug {
-		fmt.Printf("[Request]URL:%v\n", reqeuest.URL)
+		fmt.Printf("[Request]URL:%v\n", req.URL)
 	}
 
-	response, err := http.DefaultClient.Do(reqeuest)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
 	defer func() {
-		response.Body.Close()
+		res.Body.Close()
 	}()
-	resBody, err := ioutil.ReadAll(response.Body)
+	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}

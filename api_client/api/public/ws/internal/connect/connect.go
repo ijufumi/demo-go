@@ -13,8 +13,6 @@ import (
 
 const host = "wss://api.coin.z.com/ws/public/v1"
 
-// const host = "wss://ws.zaif.jp/stream?currency_pair=btc_jpy"
-
 type connectionState string
 
 const (
@@ -58,18 +56,22 @@ func New() *Connection {
 	return conn
 }
 
+// SetSubscribeFunc ...
 func (c *Connection) SetSubscribeFunc(f func() interface{}) {
 	c.subscribeFunc = c.createSendFunc(f)
 }
 
+// SetUnsubscribeFunc ...
 func (c *Connection) SetUnsubscribeFunc(f func() interface{}) {
 	c.unsubscribeFunc = c.createSendFunc(f)
 }
 
+// Subscribe ...
 func (c *Connection) Subscribe() error {
 	return c.subscribeFunc()
 }
 
+// Unsubscribe ...
 func (c *Connection) Unsubscribe() error {
 	return c.unsubscribeFunc()
 }

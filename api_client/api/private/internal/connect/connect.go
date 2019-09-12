@@ -34,25 +34,25 @@ func (c *Connection) Post(body interface{}, path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	reqeuest, err := http.NewRequest("POST", host+path, strings.NewReader(string(b)))
+	req, err := http.NewRequest("POST", host+path, strings.NewReader(string(b)))
 	if err != nil {
 		return nil, err
 	}
-	c.makeHeader(reqeuest, "POST", path, string(b))
+	c.makeHeader(time.Now(), req, "POST", path, string(b))
 
 	if configuration.Debug {
-		fmt.Printf("[Request]Header:%v\n", reqeuest.Header)
+		fmt.Printf("[Request]Header:%v\n", req.Header)
 		fmt.Printf("[Request]Body:%v\n", string(b))
 	}
-	response, err := http.DefaultClient.Do(reqeuest)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
 	defer func() {
-		response.Body.Close()
+		res.Body.Close()
 	}()
-	resBody, err := ioutil.ReadAll(response.Body)
+	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -67,26 +67,26 @@ func (c *Connection) Post(body interface{}, path string) ([]byte, error) {
 // Get ...
 func (c *Connection) Get(param url.Values, path string) ([]byte, error) {
 	queryString := param.Encode()
-	reqeuest, err := http.NewRequest("GET", host+path+"?"+queryString, nil)
+	req, err := http.NewRequest("GET", host+path+"?"+queryString, nil)
 	if err != nil {
 		return nil, err
 	}
-	c.makeHeader(reqeuest, "GET", path, "")
+	c.makeHeader(time.Now(), req, "GET", path, "")
 
 	if configuration.Debug {
-		fmt.Printf("[Request]Header:%v\n", reqeuest.Header)
-		fmt.Printf("[Request]URL:%v\n", reqeuest.URL)
+		fmt.Printf("[Request]Header:%v\n", req.Header)
+		fmt.Printf("[Request]URL:%v\n", req.URL)
 	}
 
-	response, err := http.DefaultClient.Do(reqeuest)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
 	defer func() {
-		response.Body.Close()
+		res.Body.Close()
 	}()
-	resBody, err := ioutil.ReadAll(response.Body)
+	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -98,8 +98,8 @@ func (c *Connection) Get(param url.Values, path string) ([]byte, error) {
 
 }
 
-func (c *Connection) makeHeader(r *http.Request, method, path, body string) {
-	timeStamp := time.Now().Unix() * 1000
+func (c *Connection) makeHeader(systemDatetime time.Time, r *http.Request, method, path, body string) {
+	timeStamp := systemDatetime.Unix()*1000 + int64(systemDatetime.Nanosecond())/int64(time.Microsecond)
 	r.Header.Set("API-TIMESTAMP", fmt.Sprint(timeStamp))
 	r.Header.Set("API-KEY", c.apiKey)
 	r.Header.Set("API-SIGN", auth.MakeSign(c.secretKey, timeStamp, method, path, body))
