@@ -7,10 +7,10 @@ import (
 
 func main() {
 	client := private.New("YOUR_API_KEY", "YOUR_API_SECRET")
-	accountMarginRes, err := client.AccountMargin()
+	ordersRes, err := client.Orders(12345676879)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	log.Printf("result:%+v", accountMarginRes)
+	log.Printf("ordersRes:%+v", ordersRes)
 }

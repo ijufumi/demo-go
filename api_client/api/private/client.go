@@ -9,6 +9,7 @@ import (
 type Client interface {
 	AccountMargin
 
+	Orders
 	Order
 	ActiveOrders
 	CancelOrder
@@ -19,6 +20,7 @@ type Client interface {
 type client struct {
 	accountMargin
 
+	orders
 	order
 	activeOrders
 	cancelOrder
@@ -31,6 +33,7 @@ func New(apiKey, secretKey string) Client {
 	c := &client{}
 	con := connect.New(apiKey, secretKey)
 	c.accountMargin.con = con
+	c.orders.con = con
 	c.order.con = con
 	c.activeOrders.con = con
 	c.cancelOrder.con = con
