@@ -36,8 +36,8 @@ type client struct {
 	closeOrder
 }
 
-// New create Client instance.
-func New(apiKey, secretKey string) Client {
+// NewWithKeys create Client instance.
+func NewWithKeys(apiKey, secretKey string) Client {
 	c := &client{}
 	con := connect.New(apiKey, secretKey)
 	c.accountMargin.con = con
@@ -56,9 +56,9 @@ func New(apiKey, secretKey string) Client {
 	return c
 }
 
-// NewWithEnv ...
-func NewWithEnv() Client {
+// New ...
+func New() Client {
 	apiKey := os.Getenv("API_KEY")
 	secretKey := os.Getenv("API_SECRET")
-	return New(apiKey, secretKey)
+	return NewWithKeys(apiKey, secretKey)
 }

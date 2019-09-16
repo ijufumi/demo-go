@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	client := private.New("YOUR_API_KEY", "YOUR_API_SECRET")
+	client := private.NewWithKeys("YOUR_API_KEY", "YOUR_API_SECRET")
 	accountMarginRes, err := client.AccountMargin()
 	if err != nil {
 		log.Println(err)

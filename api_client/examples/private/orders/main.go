@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	client := private.New("YOUR_API_KEY", "YOUR_API_SECRET")
+	client := private.NewWithKeys("YOUR_API_KEY", "YOUR_API_SECRET")
 	ordersRes, err := client.Orders(12345676879)
 	if err != nil {
 		log.Println(err)

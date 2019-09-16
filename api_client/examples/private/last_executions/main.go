@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	client := private.NewWithEnv()
+	client := private.New()
 	executionsRes, err := client.LastExecutions(configuration.SymbolBTCJPY, 0, 0)
 	if err != nil {
 		log.Println(err)

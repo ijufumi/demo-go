@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	client := private.NewWithEnv()
+	client := private.New()
 	executionsRes, err := client.ExecutionsByOrderID(103804777)
 	if err != nil {
 		log.Println(err)
