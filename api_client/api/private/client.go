@@ -13,6 +13,7 @@ type Client interface {
 	Orders
 	ActiveOrders
 	Executions
+	LastExecutions
 	OpenPositions
 
 	Order
@@ -27,6 +28,7 @@ type client struct {
 	orders
 	activeOrders
 	executions
+	lastExecutions
 	openPositions
 
 	order
@@ -44,6 +46,7 @@ func New(apiKey, secretKey string) Client {
 	c.orders.con = con
 	c.activeOrders.con = con
 	c.executions.con = con
+	c.lastExecutions.con = con
 	c.openPositions.con = con
 
 	c.order.con = con
