@@ -11,10 +11,12 @@ type Client interface {
 	AccountAssets
 
 	Orders
-	Order
 	ActiveOrders
-	CancelOrder
+	Executions
 	OpenPositions
+
+	Order
+	CancelOrder
 	CloseOrder
 }
 
@@ -23,10 +25,12 @@ type client struct {
 	accountAssets
 
 	orders
-	order
 	activeOrders
-	cancelOrder
+	executions
 	openPositions
+
+	order
+	cancelOrder
 	closeOrder
 }
 
@@ -38,11 +42,13 @@ func New(apiKey, secretKey string) Client {
 	c.accountAssets.con = con
 
 	c.orders.con = con
-	c.order.con = con
 	c.activeOrders.con = con
+	c.executions.con = con
+	c.openPositions.con = con
+
+	c.order.con = con
 	c.cancelOrder.con = con
 	c.closeOrder.con = con
-	c.openPositions.con = con
 
 	return c
 }
@@ -51,14 +57,5 @@ func New(apiKey, secretKey string) Client {
 func NewWithEnv() Client {
 	apiKey := os.Getenv("API_KEY")
 	secretKey := os.Getenv("API_SECRET")
-
-	c := &client{}
-	con := connect.New(apiKey, secretKey)
-	c.order.con = con
-	c.activeOrders.con = con
-	c.cancelOrder.con = con
-	c.closeOrder.con = con
-	c.openPositions.con = con
-
-	return c
+	return New(apiKey, secretKey)
 }
