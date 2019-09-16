@@ -18,6 +18,7 @@ type Client interface {
 	PositionSummary
 
 	Order
+	ChangeOrder
 	CancelOrder
 	CloseOrder
 }
@@ -34,6 +35,7 @@ type client struct {
 	positionSummary
 
 	order
+	changeOrder
 	cancelOrder
 	closeOrder
 }
@@ -53,6 +55,7 @@ func NewWithKeys(apiKey, secretKey string) Client {
 	c.positionSummary.con = con
 
 	c.order.con = con
+	c.changeOrder.con = con
 	c.cancelOrder.con = con
 	c.closeOrder.con = con
 
