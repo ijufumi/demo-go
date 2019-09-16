@@ -20,7 +20,9 @@ type Client interface {
 	Order
 	ChangeOrder
 	CancelOrder
+
 	CloseOrder
+	CloseBulkOrder
 }
 
 type client struct {
@@ -37,7 +39,9 @@ type client struct {
 	order
 	changeOrder
 	cancelOrder
+
 	closeOrder
+	closeBulkOrder
 }
 
 // NewWithKeys create Client instance.
@@ -57,7 +61,9 @@ func NewWithKeys(apiKey, secretKey string) Client {
 	c.order.con = con
 	c.changeOrder.con = con
 	c.cancelOrder.con = con
+
 	c.closeOrder.con = con
+	c.closeBulkOrder.con = con
 
 	return c
 }
